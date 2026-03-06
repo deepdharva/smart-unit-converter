@@ -1,270 +1,163 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Deevora - Connect Beyond</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deevora</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="google-site-verification" content="5bGwiK5d-UJl66ablNELEvM0WSyzjw_MOzX_5Qb5F84" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-<style>
-
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#667eea,#764ba2);
-color:white;
-}
-
-/* LOGIN */
-
-#loginPage{
-display:flex;
-height:100vh;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-}
-
-input{
-padding:10px;
-margin:8px;
-border:none;
-border-radius:5px;
-}
-
-button{
-padding:10px 15px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-background:#ff9800;
-color:white;
-font-weight:bold;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-/* MAIN APP */
-
-#app{
-display:none;
-padding:15px;
-animation:fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn{
-from{opacity:0;}
-to{opacity:1;}
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.profile-img{
-width:60px;
-height:60px;
-border-radius:50%;
-object-fit:cover;
-border:3px solid white;
-}
-
-.post-box{
-margin-top:15px;
-}
-
-.post{
-background:white;
-color:black;
-padding:10px;
-border-radius:8px;
-margin-top:10px;
-animation:fadeIn 0.4s ease-in-out;
-}
-
-.story{
-display:inline-block;
-background:white;
-color:black;
-padding:8px;
-margin:5px;
-border-radius:20px;
-cursor:pointer;
-}
-
-.notification{
-background:#ff5722;
-padding:5px 10px;
-border-radius:20px;
-font-size:12px;
-}
-
-</style>
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:linear-gradient(135deg,#667eea,#764ba2);
+      color:white;
+      text-align:center;
+    }
+    input{
+      padding:10px;
+      margin:5px;
+      border-radius:5px;
+      border:none;
+    }
+    button{
+      padding:10px 15px;
+      margin:5px;
+      border:none;
+      border-radius:5px;
+      background:#ff9800;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    #app{ display:none; padding:20px;}
+    .post{
+      background:white;
+      color:black;
+      padding:10px;
+      margin:10px auto;
+      width:300px;
+      border-radius:8px;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage">
-<h1>Welcome to Deevora 🔥</h1>
-<input type="text" id="username" placeholder="Enter Username">
-<button onclick="login()">Login</button>
+<h1>Deevora 🔥</h1>
+
+<div id="authSection">
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="register()">Register</button>
+  <button onclick="login()">Login</button>
 </div>
 
-<!-- MAIN APP -->
 <div id="app">
+  <h3 id="welcome"></h3>
+  <button onclick="logout()">Logout</button>
 
-<div class="topbar">
-<h2>Deevora</h2>
-<div>
-<span id="notifCount" class="notification">0</span>
-<button onclick="logout()">Logout</button>
-</div>
-</div>
+  <hr>
 
-<hr>
+  <input type="text" id="postInput" placeholder="What's on your mind?">
+  <button onclick="addPost()">Post</button>
 
-<!-- PROFILE -->
-<h3 id="welcome"></h3>
-<input type="file" onchange="uploadProfile(event)">
-<br>
-<img id="profilePic" class="profile-img">
-
-<p>Followers: <span id="followers">0</span></p>
-<button onclick="follow()">Follow Me 👥</button>
-
-<hr>
-
-<!-- STORIES -->
-<h3>Stories 🔥</h3>
-<input type="text" id="storyInput" placeholder="Add Story">
-<button onclick="addStory()">Add</button>
-<div id="stories"></div>
-
-<hr>
-
-<!-- POSTS -->
-<h3>Create Post ✍️</h3>
-<input type="text" id="postInput" placeholder="What's on your mind?">
-<button onclick="addPost()">Post</button>
-
-<div id="posts"></div>
-
+  <div id="feed"></div>
 </div>
 
-<script>
+<script type="module">
 
-let currentUser="";
-let followers=0;
-let notifications=0;
+// 🔴 PASTE YOUR FIREBASE CONFIG HERE
+const firebaseConfig = {
+  apiKey: "PASTE_HERE",
+  authDomain: "PASTE_HERE",
+  projectId: "PASTE_HERE",
+  storageBucket: "PASTE_HERE",
+  messagingSenderId: "PASTE_HERE",
+  appId: "PASTE_HERE"
+};
 
-/* LOGIN FUNCTION */
+// Initialize Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-function login(){
-let user=document.getElementById("username").value;
-if(user==""){
-alert("Enter username first");
-return;
-}
-currentUser=user;
-localStorage.setItem("deevoraUser",user);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-document.getElementById("loginPage").style.display="none";
-document.getElementById("app").style.display="block";
-document.getElementById("welcome").innerText="Hello, "+user+" 👋";
+// REGISTER
+window.register = function(){
+  const email=document.getElementById("email").value;
+  const pass=document.getElementById("password").value;
 
-}
-
-/* AUTO LOGIN */
-window.onload=function(){
-let savedUser=localStorage.getItem("deevoraUser");
-if(savedUser){
-currentUser=savedUser;
-document.getElementById("loginPage").style.display="none";
-document.getElementById("app").style.display="block";
-document.getElementById("welcome").innerText="Hello, "+savedUser+" 👋";
-}
-}
-
-/* LOGOUT */
-function logout(){
-localStorage.removeItem("deevoraUser");
-location.reload();
+  createUserWithEmailAndPassword(auth,email,pass)
+  .then(()=> alert("Registered Successfully 🔥"))
+  .catch(err=> alert(err.message));
 }
 
-/* PROFILE UPLOAD */
+// LOGIN
+window.login = function(){
+  const email=document.getElementById("email").value;
+  const pass=document.getElementById("password").value;
 
-function uploadProfile(event){
-let reader=new FileReader();
-reader.onload=function(){
-document.getElementById("profilePic").src=reader.result;
-localStorage.setItem("profilePic",reader.result);
-}
-reader.readAsDataURL(event.target.files[0]);
+  signInWithEmailAndPassword(auth,email,pass)
+  .catch(err=> alert(err.message));
 }
 
-window.onload=function(){
-let savedUser=localStorage.getItem("deevoraUser");
-if(savedUser){
-currentUser=savedUser;
-document.getElementById("loginPage").style.display="none";
-document.getElementById("app").style.display="block";
-document.getElementById("welcome").innerText="Hello, "+savedUser+" 👋";
-}
-let savedPic=localStorage.getItem("profilePic");
-if(savedPic){
-document.getElementById("profilePic").src=savedPic;
-}
+// LOGOUT
+window.logout = function(){
+  signOut(auth);
 }
 
-/* FOLLOW SYSTEM */
+// AUTH STATE
+onAuthStateChanged(auth,user=>{
+  if(user){
+    document.getElementById("authSection").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("welcome").innerText="Welcome "+user.email;
+    loadPosts();
+  }else{
+    document.getElementById("authSection").style.display="block";
+    document.getElementById("app").style.display="none";
+  }
+});
 
-function follow(){
-followers++;
-document.getElementById("followers").innerText=followers;
-addNotification("Someone followed you 👥");
+// ADD POST
+window.addPost = async function(){
+  const text=document.getElementById("postInput").value;
+  if(text=="") return;
+
+  await addDoc(collection(db,"posts"),{
+    text:text,
+    email:auth.currentUser.email,
+    created:Date.now()
+  });
+
+  document.getElementById("postInput").value="";
 }
 
-/* STORIES */
-
-function addStory(){
-let storyText=document.getElementById("storyInput").value;
-if(storyText=="") return;
-
-let story=document.createElement("div");
-story.className="story";
-story.innerText=storyText;
-
-document.getElementById("stories").appendChild(story);
-document.getElementById("storyInput").value="";
-
-addNotification("New story added 🔥");
-}
-
-/* POSTS */
-
-function addPost(){
-let postText=document.getElementById("postInput").value;
-if(postText=="") return;
-
-let post=document.createElement("div");
-post.className="post";
-post.innerHTML="<strong>"+currentUser+":</strong><br>"+postText;
-
-document.getElementById("posts").prepend(post);
-document.getElementById("postInput").value="";
-
-addNotification("New post created ✍️");
-}
-
-/* NOTIFICATIONS */
-
-function addNotification(msg){
-notifications++;
-document.getElementById("notifCount").innerText=notifications;
+// LOAD POSTS
+function loadPosts(){
+  const q=query(collection(db,"posts"), orderBy("created","desc"));
+  onSnapshot(q,(snapshot)=>{
+    let feed=document.getElementById("feed");
+    feed.innerHTML="";
+    snapshot.forEach(doc=>{
+      let data=doc.data();
+      feed.innerHTML+=`
+        <div class="post">
+          <strong>${data.email}</strong><br>
+          ${data.text}
+        </div>
+      `;
+    });
+  });
 }
 
 </script>
