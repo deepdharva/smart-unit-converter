@@ -1,4 +1,4 @@
-let username = localStorage.getItem("nexchat_user")
+let username = localStorage.getItem("talkvera_user")
 
 if(username){
 startApp()
@@ -10,7 +10,7 @@ username = document.getElementById("username").value
 
 if(username=="") return alert("Enter username")
 
-localStorage.setItem("nexchat_user",username)
+localStorage.setItem("talkvera_user",username)
 
 startApp()
 
@@ -25,10 +25,10 @@ loadMessages()
 
 }
 
-let messages = JSON.parse(localStorage.getItem("nexchat_msgs")) || []
+let messages = JSON.parse(localStorage.getItem("talkvera_msgs")) || []
 
 function save(){
-localStorage.setItem("nexchat_msgs",JSON.stringify(messages))
+localStorage.setItem("talkvera_msgs",JSON.stringify(messages))
 render()
 }
 
