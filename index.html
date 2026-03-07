@@ -1,52 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Talkvera Chat</title>
 
-<title>Talkvera</title>
+<style>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+body{
+font-family:Arial;
+background:#0b141a;
+color:white;
+margin:0;
+}
 
-<link rel="stylesheet" href="style.css">
+#login{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+height:100vh;
+}
 
+input{
+padding:10px;
+margin:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+padding:10px 20px;
+background:#25D366;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+#chat{
+display:none;
+height:100vh;
+}
+
+#messages{
+height:80vh;
+overflow:auto;
+padding:10px;
+}
+
+.message{
+background:#202c33;
+margin:5px;
+padding:8px;
+border-radius:8px;
+}
+
+#sendBox{
+display:flex;
+}
+
+#sendBox input{
+flex:1;
+}
+
+</style>
 </head>
 
 <body>
 
-<header>
-💬 Talkvera
-</header>
-
 <div id="login">
 
-<h2>Enter Username</h2>
+<h1>Talkvera</h1>
 
-<input id="username" placeholder="Your name">
+<input id="username" placeholder="Enter your name">
 
-<button onclick="startChat()">Start Chat</button>
+<button onclick="login()">Start Chat</button>
 
 </div>
 
-<div id="chatApp">
 
-<div id="chat"></div>
+<div id="chat">
 
-<div id="controls">
+<div id="messages"></div>
 
-<input id="msg" placeholder="Type message 🙂">
+<div id="sendBox">
 
-<input type="file" id="imgInput">
+<input id="msgInput" placeholder="Type message">
 
 <button onclick="sendMsg()">Send</button>
 
-<button onclick="recordVoice()">🎤</button>
-
-<button onclick="clearChat()">🗑</button>
-
 </div>
 
 </div>
 
-<script src="script.js"></script>
+<script>
+
+let user="";
+
+function login(){
+
+user=document.getElementById("username").value;
+
+if(user==""){
+alert("Enter name");
+return;
+}
+
+document.getElementById("login").style.display="none";
+document.getElementById("chat").style.display="block";
+
+loadMessages();
+
+}
+
+function sendMsg(){
+
+let msg=document.getElementById("msgInput").value;
+
+if(msg=="") return;
+
+let messages=JSON.parse(localStorage.getItem("chat")||"[]");
+
+messages.push({
+user:user,
+text:msg
+});
+
+localStorage.setItem("chat",JSON.stringify(messages));
+
+document.getElementById("msgInput").value="";
+
+loadMessages();
+
+}
+
+function loadMessages(){
+
+let messages=JSON.parse(localStorage.getItem("chat")||"[]");
+
+let html="";
+
+messages.forEach(m=>{
+
+html+=`<div class="message"><b>${m.user}:</b> ${m.text}</div>`;
+
+});
+
+document.getElementById("messages").innerHTML=html;
+
+}
+
+setInterval(loadMessages,1000);
+
+</script>
 
 </body>
 </html>
