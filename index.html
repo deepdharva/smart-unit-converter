@@ -1,156 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>Talkvera Chat</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Unit Converter</title>
 
-<style>
+<link rel="stylesheet" href="style.css">
 
-body{
-font-family:Arial;
-background:#0b141a;
-color:white;
-margin:0;
-}
-
-#login{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-height:100vh;
-}
-
-input{
-padding:10px;
-margin:10px;
-border-radius:8px;
-border:none;
-}
-
-button{
-padding:10px 20px;
-background:#25D366;
-border:none;
-border-radius:8px;
-cursor:pointer;
-}
-
-#chat{
-display:none;
-height:100vh;
-}
-
-#messages{
-height:80vh;
-overflow:auto;
-padding:10px;
-}
-
-.message{
-background:#202c33;
-margin:5px;
-padding:8px;
-border-radius:8px;
-}
-
-#sendBox{
-display:flex;
-}
-
-#sendBox input{
-flex:1;
-}
-
-</style>
 </head>
 
 <body>
 
-<div id="login">
+<h1>🔄 Smart Unit Converter</h1>
 
-<h1>Talkvera</h1>
+<button id="modeToggle">🌙 Toggle Mode</button>
 
-<input id="username" placeholder="Enter your name">
+<div class="converter">
 
-<button onclick="login()">Start Chat</button>
+<input type="number" id="inputValue" placeholder="Enter value">
+
+<select id="conversionType">
+
+<option value="kmToM">Kilometer → Meter</option>
+<option value="mToKm">Meter → Kilometer</option>
+
+<option value="kgToG">Kilogram → Gram</option>
+<option value="gToKg">Gram → Kilogram</option>
+
+<option value="cToF">Celsius → Fahrenheit</option>
+<option value="fToC">Fahrenheit → Celsius</option>
+
+<option value="cmToIn">Centimeter → Inch</option>
+<option value="inToCm">Inch → Centimeter</option>
+
+<option value="kmhToMs">km/h → m/s</option>
+<option value="msToKmh">m/s → km/h</option>
+
+</select>
+
+<h2 id="result">Result: </h2>
 
 </div>
 
+<footer>
 
-<div id="chat">
+Made with ❤️ by Deep
 
-<div id="messages"></div>
+</footer>
 
-<div id="sendBox">
-
-<input id="msgInput" placeholder="Type message">
-
-<button onclick="sendMsg()">Send</button>
-
-</div>
-
-</div>
-
-<script>
-
-let user="";
-
-function login(){
-
-user=document.getElementById("username").value;
-
-if(user==""){
-alert("Enter name");
-return;
-}
-
-document.getElementById("login").style.display="none";
-document.getElementById("chat").style.display="block";
-
-loadMessages();
-
-}
-
-function sendMsg(){
-
-let msg=document.getElementById("msgInput").value;
-
-if(msg=="") return;
-
-let messages=JSON.parse(localStorage.getItem("chat")||"[]");
-
-messages.push({
-user:user,
-text:msg
-});
-
-localStorage.setItem("chat",JSON.stringify(messages));
-
-document.getElementById("msgInput").value="";
-
-loadMessages();
-
-}
-
-function loadMessages(){
-
-let messages=JSON.parse(localStorage.getItem("chat")||"[]");
-
-let html="";
-
-messages.forEach(m=>{
-
-html+=`<div class="message"><b>${m.user}:</b> ${m.text}</div>`;
-
-});
-
-document.getElementById("messages").innerHTML=html;
-
-}
-
-setInterval(loadMessages,1000);
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
