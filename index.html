@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Unit Converter</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -16,7 +13,7 @@
 
 <button id="modeToggle">🌙 Toggle Mode</button>
 
-<div class="converter">
+<div class="container">
 
 <input type="number" id="inputValue" placeholder="Enter value">
 
@@ -37,6 +34,9 @@
 <option value="kmhToMs">km/h → m/s</option>
 <option value="msToKmh">m/s → km/h</option>
 
+<option value="usdToInr">USD → INR</option>
+<option value="inrToUsd">INR → USD</option>
+
 </select>
 
 <h2 id="result">Result: </h2>
@@ -44,9 +44,7 @@
 </div>
 
 <footer>
-
 Made with ❤️ by Deep
-
 </footer>
 
 <script src="script.js"></script>
