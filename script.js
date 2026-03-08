@@ -1,71 +1,79 @@
-let input = document.getElementById("inputValue");
-let type = document.getElementById("conversionType");
-let result = document.getElementById("result");
+const input = document.getElementById("inputValue");
+const type = document.getElementById("conversionType");
+const result = document.getElementById("result");
+
+input.addEventListener("input", convert);
+type.addEventListener("change", convert);
 
 function convert(){
 
-let value = Number(input.value);
+let value = parseFloat(input.value);
 
-if(!value){
+if(isNaN(value)){
 result.innerText="Result:";
 return;
 }
 
-let r=0;
+let output;
 
 switch(type.value){
 
 case "kmToM":
-r=value*1000;
+output=value*1000;
 break;
 
 case "mToKm":
-r=value/1000;
+output=value/1000;
 break;
 
 case "kgToG":
-r=value*1000;
+output=value*1000;
 break;
 
 case "gToKg":
-r=value/1000;
+output=value/1000;
 break;
 
 case "cToF":
-r=(value*9/5)+32;
+output=(value*9/5)+32;
 break;
 
 case "fToC":
-r=(value-32)*5/9;
+output=(value-32)*5/9;
 break;
 
 case "cmToIn":
-r=value/2.54;
+output=value/2.54;
 break;
 
 case "inToCm":
-r=value*2.54;
+output=value*2.54;
 break;
 
 case "kmhToMs":
-r=value/3.6;
+output=value/3.6;
 break;
 
 case "msToKmh":
-r=value*3.6;
+output=value*3.6;
+break;
+
+case "usdToInr":
+output=value*83;
+break;
+
+case "inrToUsd":
+output=value/83;
 break;
 
 }
 
-result.innerText="Result: "+r;
+result.innerText="Result: "+output;
 
 }
 
-input.addEventListener("input",convert);
-type.addEventListener("change",convert);
+const toggle=document.getElementById("modeToggle");
 
-document.getElementById("modeToggle").onclick=function(){
-
+toggle.onclick=()=>{
 document.body.classList.toggle("dark");
-
 };
